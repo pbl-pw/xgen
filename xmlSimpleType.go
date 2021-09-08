@@ -14,8 +14,9 @@ import "encoding/xml"
 // simpleType element defines a simple type and specifies the constraints and
 // information about the values of attributes or text-only elements.
 func (opt *Options) OnSimpleType(ele xml.StartElement, protoTree []interface{}) (err error) {
+	doc := getCommentDoc(ele)
 	if opt.SimpleType.Len() == 0 {
-		opt.SimpleType.Push(&SimpleType{})
+		opt.SimpleType.Push(&SimpleType{Doc: doc})
 	}
 	if opt.CurrentEle == "attributeGroup" {
 		// return
@@ -23,7 +24,9 @@ func (opt *Options) OnSimpleType(ele xml.StartElement, protoTree []interface{}) 
 	opt.CurrentEle = opt.InElement
 	for _, attr := range ele.Attr {
 		if attr.Name.Local == "name" {
-			opt.SimpleType.Peek().(*SimpleType).Name = attr.Value
+			stp := opt.SimpleType.Peek().(*SimpleType)
+			stp.Name = attr.Value
+			stp.Doc = doc
 		}
 	}
 	return

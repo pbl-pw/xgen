@@ -8,7 +8,10 @@
 
 package xgen
 
-import "strings"
+import (
+	"encoding/xml"
+	"strings"
+)
 
 // OnCharData handles parsing event on the documentation start elements. The
 // documentation element specifies information to be read or used by users
@@ -62,4 +65,13 @@ func (opt *Options) OnCharData(ele string, protoTree []interface{}) (err error) 
 	default:
 	}
 	return
+}
+
+func getCommentDoc(ele xml.StartElement) string {
+	for _, element := range ele.Attr {
+		if element.Name.Local == "comment" {
+			return element.Value
+		}
+	}
+	return ""
 }

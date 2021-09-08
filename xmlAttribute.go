@@ -15,6 +15,7 @@ import "encoding/xml"
 func (opt *Options) OnAttribute(ele xml.StartElement, protoTree []interface{}) (err error) {
 	attribute := Attribute{
 		Optional: true,
+		Doc:      getCommentDoc(ele),
 	}
 	for _, attr := range ele.Attr {
 		if attr.Name.Local == "ref" {

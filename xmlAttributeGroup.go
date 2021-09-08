@@ -15,7 +15,7 @@ import "encoding/xml"
 // declarations so that they can be incorporated as a group into complex type
 // definitions.
 func (opt *Options) OnAttributeGroup(ele xml.StartElement, protoTree []interface{}) (err error) {
-	attributeGroup := AttributeGroup{}
+	attributeGroup := AttributeGroup{Doc: getCommentDoc(ele)}
 	for _, attr := range ele.Attr {
 		if attr.Name.Local == "name" {
 			attributeGroup.Name = attr.Value

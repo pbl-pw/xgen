@@ -157,7 +157,7 @@ func (gen *CodeGenerator) TypeScriptComplexType(v *ComplexType) {
 
 		for _, element := range v.Elements {
 			fieldType := genTypeScriptFieldType(getBasefromSimpleType(trimNSPrefix(element.Type), gen.ProtoTree), element.Plural)
-			content += fmt.Sprintf("\t%s: %s;\n", genTypeScriptFieldName(element.Name), fieldType)
+			content += fmt.Sprintf("\t%s: %s;%s\n", genTypeScriptFieldName(element.Name), fieldType, genLineComment(element.Doc, "//"))
 		}
 		content += "}\n"
 		gen.StructAST[v.Name] = content
@@ -172,7 +172,7 @@ func (gen *CodeGenerator) TypeScriptGroup(v *Group) {
 	if _, ok := gen.StructAST[v.Name]; !ok {
 		content := " {\n"
 		for _, element := range v.Elements {
-			content += fmt.Sprintf("\t%s: %s;\n", genTypeScriptFieldName(element.Name), genTypeScriptFieldType(getBasefromSimpleType(trimNSPrefix(element.Type), gen.ProtoTree), element.Plural))
+			content += fmt.Sprintf("\t%s: %s;%s\n", genTypeScriptFieldName(element.Name), genTypeScriptFieldType(getBasefromSimpleType(trimNSPrefix(element.Type), gen.ProtoTree), element.Plural), genLineComment(element.Doc, "//"))
 		}
 
 		for _, group := range v.Groups {

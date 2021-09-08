@@ -15,7 +15,7 @@ import (
 
 // OnElement handles parsing event on the element start elements.
 func (opt *Options) OnElement(ele xml.StartElement, protoTree []interface{}) (err error) {
-	e := Element{}
+	e := Element{Doc: getCommentDoc(ele)}
 	for _, attr := range ele.Attr {
 		if attr.Name.Local == "ref" {
 			e.Name = attr.Value

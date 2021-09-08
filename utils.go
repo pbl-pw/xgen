@@ -249,7 +249,15 @@ func fetchSchema(URL string) ([]byte, error) {
 func genFieldComment(name, doc, prefix string) string {
 	docReplacer := strings.NewReplacer("\n", fmt.Sprintf("\r\n%s ", prefix), "\t", "")
 	if doc == "" {
-		return fmt.Sprintf("\r\n%s %s ...\r\n", prefix, name)
+		return "\r\n"
 	}
-	return fmt.Sprintf("\r\n%s %s is %s\r\n", prefix, name, docReplacer.Replace(doc))
+	return fmt.Sprintf("\r\n%s %s\r\n", prefix, docReplacer.Replace(doc))
+}
+
+func genLineComment(doc, prefix string) string {
+	docReplacer := strings.NewReplacer("\n", fmt.Sprintf("\r\n%s ", prefix), "\t", "")
+	if doc == "" {
+		return ""
+	}
+	return fmt.Sprintf("%s %s", prefix, docReplacer.Replace(doc))
 }

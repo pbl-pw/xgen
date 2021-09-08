@@ -13,15 +13,17 @@ import "encoding/xml"
 // OnComplexType handles parsing event on the complex start elements. A
 // complex element contains other elements and/or attributes.
 func (opt *Options) OnComplexType(ele xml.StartElement, protoTree []interface{}) (err error) {
+	doc := getCommentDoc(ele)
 	if opt.ComplexType.Len() > 0 {
 		e := opt.Element.Pop().(*Element)
 		opt.ComplexType.Push(&ComplexType{
 			Name: e.Name,
+			Doc:  doc,
 		})
 	}
 
 	if opt.ComplexType.Len() == 0 {
-		c := ComplexType{}
+		c := ComplexType{Doc: doc}
 		opt.CurrentEle = opt.InElement
 		for _, attr := range ele.Attr {
 			if attr.Name.Local == "name" {

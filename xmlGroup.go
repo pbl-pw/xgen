@@ -14,7 +14,7 @@ import "encoding/xml"
 // element is used to define a group of elements to be used in complex type
 // definitions.
 func (opt *Options) OnGroup(ele xml.StartElement, protoTree []interface{}) (err error) {
-	group := Group{}
+	group := Group{Doc: getCommentDoc(ele)}
 	for _, attr := range ele.Attr {
 		if attr.Name.Local == "name" {
 			group.Name = attr.Value

@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"golang.org/x/net/html/charset"
@@ -105,15 +106,14 @@ func (opt *Options) Parse() (err error) {
 		switch element := token.(type) {
 		case xml.StartElement:
 			opt.InElement = element.Name.Local
+			if comment != "" {
+				re := regexp.MustCompile("\\s{2,}")
+				element.Attr = append(element.Attr, xml.Attr{Name: xml.Name{Local: "comment"}, Value: re.ReplaceAllString(comment, " ")})
+				comment = ""
+			}
 			funcName := fmt.Sprintf("On%s", MakeFirstUpperCase(opt.InElement))
 			if err = callFuncByName(opt, funcName, []reflect.Value{reflect.ValueOf(element), reflect.ValueOf(opt.ProtoTree)}); err != nil {
 				return
-			}
-			if len(comment) != 0 {
-				if err = opt.OnCharData(comment, opt.ProtoTree); err != nil {
-					return
-				}
-				comment = ""
 			}
 
 		case xml.EndElement:
@@ -121,10 +121,10 @@ func (opt *Options) Parse() (err error) {
 			if err = callFuncByName(opt, funcName, []reflect.Value{reflect.ValueOf(element), reflect.ValueOf(opt.ProtoTree)}); err != nil {
 				return
 			}
-		case xml.CharData:
-			if err = opt.OnCharData(string(element), opt.ProtoTree); err != nil {
-				return
-			}
+		// case xml.CharData:
+		// 	if err = opt.OnCharData(string(element), opt.ProtoTree); err != nil {
+		// 		return
+		// 	}
 		case xml.Comment:
 			comment = string(element)
 		default:
