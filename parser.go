@@ -96,7 +96,7 @@ func (opt *Options) Parse() (err error) {
 
 	decoder := xml.NewDecoder(xmlFile)
 	decoder.CharsetReader = charset.NewReaderLabel
-	for {
+	for comment := ""; ; {
 		token, _ := decoder.Token()
 		if token == nil {
 			break
@@ -104,11 +104,16 @@ func (opt *Options) Parse() (err error) {
 
 		switch element := token.(type) {
 		case xml.StartElement:
-
 			opt.InElement = element.Name.Local
 			funcName := fmt.Sprintf("On%s", MakeFirstUpperCase(opt.InElement))
 			if err = callFuncByName(opt, funcName, []reflect.Value{reflect.ValueOf(element), reflect.ValueOf(opt.ProtoTree)}); err != nil {
 				return
+			}
+			if len(comment) != 0 {
+				if err = opt.OnCharData(comment, opt.ProtoTree); err != nil {
+					return
+				}
+				comment = ""
 			}
 
 		case xml.EndElement:
@@ -120,6 +125,8 @@ func (opt *Options) Parse() (err error) {
 			if err = opt.OnCharData(string(element), opt.ProtoTree); err != nil {
 				return
 			}
+		case xml.Comment:
+			comment = string(element)
 		default:
 		}
 

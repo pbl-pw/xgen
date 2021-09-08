@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"strings"
 )
 
 var typeScriptBuildInType = map[string]bool{
@@ -47,27 +46,29 @@ func (gen *CodeGenerator) GenTypeScript() error {
 }
 
 func genTypeScriptFieldName(name string) (fieldName string) {
-	for _, str := range strings.Split(name, ":") {
-		fieldName += MakeFirstUpperCase(str)
-	}
-	var tmp string
-	for _, str := range strings.Split(fieldName, ".") {
-		tmp += MakeFirstUpperCase(str)
-	}
-	fieldName = tmp
-	fieldName = strings.Replace(fieldName, "-", "", -1)
+	// for _, str := range strings.Split(name, ":") {
+	// 	fieldName += MakeFirstUpperCase(str)
+	// }
+	// var tmp string
+	// for _, str := range strings.Split(fieldName, ".") {
+	// 	tmp += MakeFirstUpperCase(str)
+	// }
+	// fieldName = tmp
+	// fieldName = strings.Replace(fieldName, "-", "", -1)
+	fieldName = name
 	return
 }
 
 func genTypeScriptFieldType(name string, plural bool) (fieldType string) {
-	if _, ok := typeScriptBuildInType[name]; ok {
-		fieldType = name
-		return
-	}
-	for _, str := range strings.Split(name, ".") {
-		fieldType += MakeFirstUpperCase(str)
-	}
-	fieldType = MakeFirstUpperCase(strings.Replace(fieldType, "-", "", -1))
+	// if _, ok := typeScriptBuildInType[name]; ok {
+	// 	fieldType = name
+	// 	return
+	// }
+	// for _, str := range strings.Split(name, ".") {
+	// 	fieldType += MakeFirstUpperCase(str)
+	// }
+	// fieldType = MakeFirstUpperCase(strings.Replace(fieldType, "-", "", -1))
+	fieldType = name
 	if fieldType == "" || fieldType == "Any" {
 		fieldType = "any"
 	}
@@ -112,7 +113,7 @@ func (gen *CodeGenerator) TypeScriptSimpleType(v *SimpleType) {
 		for _, enum := range v.Restriction.Enum {
 			switch baseType {
 			case "string":
-				content += fmt.Sprintf("\t%s = '%s',\n", enum, enum)
+				content += fmt.Sprintf("\t'%s' = '%s',\n", enum, enum)
 			case "number":
 				content += fmt.Sprintf("\tEnum%s = %s,\n", enum, enum)
 			default:
@@ -148,7 +149,7 @@ func (gen *CodeGenerator) TypeScriptComplexType(v *ComplexType) {
 				optional = ` | null`
 			}
 			fieldType := genTypeScriptFieldType(getBasefromSimpleType(trimNSPrefix(attribute.Type), gen.ProtoTree), attribute.Plural)
-			content += fmt.Sprintf("\t%sAttr: %s%s;\n", genTypeScriptFieldName(attribute.Name), fieldType, optional)
+			content += fmt.Sprintf("\t'@%s': %s%s;\n", genTypeScriptFieldName(attribute.Name), fieldType, optional)
 		}
 		for _, group := range v.Groups {
 			content += fmt.Sprintf("\t%s: %s;\n", genTypeScriptFieldName(group.Name), genTypeScriptFieldType(getBasefromSimpleType(trimNSPrefix(group.Ref), gen.ProtoTree), group.Plural))
@@ -196,7 +197,7 @@ func (gen *CodeGenerator) TypeScriptAttributeGroup(v *AttributeGroup) {
 			if attribute.Optional {
 				optional = ` | null`
 			}
-			content += fmt.Sprintf("\t%sAttr: %s%s;\n", genTypeScriptFieldName(attribute.Name), genTypeScriptFieldType(getBasefromSimpleType(trimNSPrefix(attribute.Type), gen.ProtoTree), attribute.Plural), optional)
+			content += fmt.Sprintf("\t'@%s': %s%s;\n", genTypeScriptFieldName(attribute.Name), genTypeScriptFieldType(getBasefromSimpleType(trimNSPrefix(attribute.Type), gen.ProtoTree), attribute.Plural), optional)
 		}
 		content += "}\n"
 		gen.StructAST[v.Name] = content

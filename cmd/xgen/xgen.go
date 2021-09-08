@@ -28,6 +28,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/xuri/xgen"
 )
@@ -100,7 +101,7 @@ func parseFlags() *Config {
 
 func main() {
 	cfg := parseFlags()
-	if err := xgen.PrepareOutputDir(cfg.O); err != nil {
+	if err := xgen.PrepareOutputDir(filepath.Dir(cfg.O)); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}

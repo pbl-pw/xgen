@@ -54,6 +54,11 @@ func (opt *Options) OnCharData(ele string, protoTree []interface{}) (err error) 
 			opt.ComplexType.Peek().(*ComplexType).Doc = ele
 			return
 		}
+	case "group":
+		if opt.Group.Peek() != nil {
+			opt.Group.Peek().(*Group).Doc = ele
+			return
+		}
 	default:
 	}
 	return
